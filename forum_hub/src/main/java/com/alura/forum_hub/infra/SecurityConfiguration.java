@@ -3,6 +3,7 @@ package com.alura.forum_hub.infra;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -26,7 +27,9 @@ public class SecurityConfiguration {
 		return httpSecurity.csrf(csrf -> csrf.disable())
 				.sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authorizeHttpRequests(ahr -> {
-					ahr.requestMatchers("/login").permitAll().anyRequest().authenticated();
+					ahr.requestMatchers(HttpMethod.POST, "/login", "/login/cadastro").permitAll()
+							.anyRequest()
+							.authenticated();
 				}).addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class).build();
 	}
 
