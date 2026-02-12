@@ -1,0 +1,40 @@
+# --- Maven & Build ---
+target/
+*.jar
+*.war
+*.ear
+
+# --- Maven Wrapper ---
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/resources/*.jar  
+
+# --- IDEs & LSP (Eclipse/STS/IntelliJ/VS Code) ---
+.settings/
+.project
+.classpath
+.factorypath
+.springBeans
+.sts4-cache
+.gitattributes
+.idea/
+*.iml
+.vscode/
+
+# --- Neovim & Editores ---
+*.swp
+*.swo
+*~
+.netrwhist
+*.un~
+.lsp-logs/
+.nvim-jdtls/
+
+# --- Sistema & Logs ---
+.DS_Store
+Thumbs.db
+*.log
+logs/
+temp/
+
+# --- Documentação automática ---
+HELP.md
