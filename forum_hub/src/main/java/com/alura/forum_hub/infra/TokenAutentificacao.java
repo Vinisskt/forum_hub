@@ -36,9 +36,7 @@ public class TokenAutentificacao {
 
 	public String getSubject(String tokenJWT) {
 		try {
-
 			var algorithm = Algorithm.HMAC256(secret);
-			System.out.println("entrou em getsubject");
 			return JWT.require(algorithm)
 					.withIssuer("forum_hub_token")
 					.build()
