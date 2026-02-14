@@ -38,6 +38,7 @@ public class TopicoController {
 	@Autowired
 	private ValidacoesTopicoCadastro validacoesTopicoCadastro;
 
+	// controler Topicos
 	@PostMapping
 	@Transactional
 	public ResponseEntity cadastrarTopico(@RequestBody @Valid DadosCadastroTopico dados,

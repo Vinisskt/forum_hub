@@ -27,7 +27,8 @@ public class SecurityConfiguration {
 		return httpSecurity.csrf(csrf -> csrf.disable())
 				.sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authorizeHttpRequests(ahr -> {
-					ahr.requestMatchers(HttpMethod.POST, "/login", "/login/cadastro").permitAll()
+					ahr.requestMatchers(HttpMethod.POST, "usuario/login", "/usuario/cadastro")
+							.permitAll()
 							.anyRequest()
 							.authenticated();
 				}).addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class).build();
