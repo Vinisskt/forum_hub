@@ -6,5 +6,6 @@ import com.alura.forum_hub.topicos.Topico;
 
 public interface TopicoRepository extends JpaRepository<Topico, Long> {
 
-	Boolean existsByTituloAndMensagem(String titulo, String mensagem);
+  Boolean existsByTituloAndMensagem(String titulo, String mensagem);
+
 }
