@@ -19,29 +19,29 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class SecurityConfiguration {
 
-	@Autowired
-	private SecurityFilter securityFilter;
+  @Autowired
+  private SecurityFilter securityFilter;
 
-	@Bean
-	public SecurityFilterChain configurarAutentificacaoAutorizacao(HttpSecurity httpSecurity) throws Exception {
-		return httpSecurity.csrf(csrf -> csrf.disable())
-				.sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				.authorizeHttpRequests(ahr -> {
-					ahr.requestMatchers(HttpMethod.POST, "usuario/login", "/usuario/cadastro")
-							.permitAll()
-							.anyRequest()
-							.authenticated();
-				}).addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class).build();
-	}
+  @Bean
+  public SecurityFilterChain configurarAutentificacaoAutorizacao(HttpSecurity httpSecurity) throws Exception {
+    return httpSecurity.csrf(csrf -> csrf.disable())
+        .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+        .authorizeHttpRequests(ahr -> {
+          ahr.requestMatchers(HttpMethod.POST, "/usuario/login", "/usuario/cadastro")
+              .permitAll()
+              .anyRequest()
+              .authenticated();
+        }).addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class).build();
+  }
 
-	@Bean
-	public AuthenticationManager authenticationManager(AuthenticationConfiguration autenticacaoConfig)
-			throws Exception {
-		return autenticacaoConfig.getAuthenticationManager();
-	}
+  @Bean
+  public AuthenticationManager authenticationManager(AuthenticationConfiguration autenticacaoConfig)
+      throws Exception {
+    return autenticacaoConfig.getAuthenticationManager();
+  }
 
-	@Bean
-	public PasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+  }
 }
