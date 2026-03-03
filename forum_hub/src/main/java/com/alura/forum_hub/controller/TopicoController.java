@@ -20,6 +20,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.alura.forum_hub.infra.validacoes.ValidacaoIdExiste;
 import com.alura.forum_hub.infra.validacoes.ValidacoesTopicoCadastro;
 import com.alura.forum_hub.repository.TopicoRepository;
+import com.alura.forum_hub.repository.UsuarioRepository;
 import com.alura.forum_hub.topicos.*;
 import com.alura.forum_hub.usuario.Usuario;
 
@@ -29,55 +30,59 @@ import jakarta.validation.Valid;
 @RequestMapping("/topicos")
 public class TopicoController {
 
-	@Autowired
-	private TopicoRepository repository;
+  @Autowired
+  private UsuarioRepository usuarioRepository;
 
-	@Autowired
-	private ValidacaoIdExiste idExiste;
+  @Autowired
+  private TopicoRepository repository;
 
-	@Autowired
-	private ValidacoesTopicoCadastro validacoesTopicoCadastro;
+  @Autowired
+  private ValidacaoIdExiste idExiste;
 
-	// controler Topicos
-	@PostMapping
-	@Transactional
-	public ResponseEntity cadastrarTopico(@RequestBody @Valid DadosCadastroTopico dados,
-			UriComponentsBuilder uriComponentsBuilder) {
-		var usuarioLogado = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-		validacoesTopicoCadastro.validar(dados);
-		var topico = new Topico(dados, usuarioLogado);
-		repository.save(topico);
-		var uri = uriComponentsBuilder.path("topicos/{id}").buildAndExpand(topico.getId()).toUri();
-		return ResponseEntity.created(uri).body(new DadosDetalhamentoTopico(topico));
-	}
+  @Autowired
+  private ValidacoesTopicoCadastro validacoesTopicoCadastro;
 
-	@PutMapping("/{id}")
-	@Transactional
-	public ResponseEntity AtualizarTopico(@RequestBody @Valid DadosAtualizarTopico dados, @PathVariable Long id) {
-		idExiste.validar(id);
-		var topico = repository.getReferenceById(id);
-		topico.atualizarTopico(dados);
-		return ResponseEntity.ok(new DadosDetalhamentoTopico(topico));
-	}
+  // controler Topicos
+  @PostMapping
+  @Transactional
+  public ResponseEntity cadastrarTopico(@RequestBody @Valid DadosCadastroTopico dados,
+      UriComponentsBuilder uriComponentsBuilder) {
+    var autenticacao = SecurityContextHolder.getContext().getAuthentication().getName();
+    var usuarioLogado = usuarioRepository.findUsuarioByLogin(autenticacao);
+    validacoesTopicoCadastro.validar(dados);
+    var topico = new Topico(dados, usuarioLogado);
+    topico = repository.save(topico);
+    var uri = uriComponentsBuilder.path("topicos/{id}").buildAndExpand(topico.getId()).toUri();
+    return ResponseEntity.created(uri).body(new DadosDetalhamentoTopico(topico));
+  }
 
-	@DeleteMapping("/{id}")
-	@Transactional
-	public ResponseEntity deletarTopico(@PathVariable Long id) {
-		idExiste.validar(id);
-		repository.deleteById(id);
-		return ResponseEntity.noContent().build();
-	}
+  @PutMapping("/{id}")
+  @Transactional
+  public ResponseEntity AtualizarTopico(@RequestBody @Valid DadosAtualizarTopico dados, @PathVariable Long id) {
+    idExiste.validar(id);
+    var topico = repository.getReferenceById(id);
+    topico.atualizarTopico(dados);
+    return ResponseEntity.ok(new DadosDetalhamentoTopico(topico));
+  }
 
-	@GetMapping
-	public ResponseEntity<Page> listarTopicos(@PageableDefault(size = 10, sort = { "data" }) Pageable page) {
-		var topicos = repository.findAll(page).map(DadosDetalhamentoTopico::new);
-		return ResponseEntity.ok(topicos);
-	}
+  @DeleteMapping("/{id}")
+  @Transactional
+  public ResponseEntity deletarTopico(@PathVariable Long id) {
+    idExiste.validar(id);
+    repository.deleteById(id);
+    return ResponseEntity.noContent().build();
+  }
 
-	@GetMapping("/{id}")
-	public ResponseEntity DetalharTopico(@PathVariable Long id) {
-		idExiste.validar(id);
-		var detalhamento = repository.getReferenceById(id);
-		return ResponseEntity.ok(new DadosDetalhamentoTopico(detalhamento));
-	}
+  @GetMapping
+  public ResponseEntity<Page> listarTopicos(@PageableDefault(size = 10, sort = { "data" }) Pageable page) {
+    var topicos = repository.findAll(page).map(DadosDetalhamentoTopico::new);
+    return ResponseEntity.ok(topicos);
+  }
+
+  @GetMapping("/{id}")
+  public ResponseEntity DetalharTopico(@PathVariable Long id) {
+    idExiste.validar(id);
+    var detalhamento = repository.getReferenceById(id);
+    return ResponseEntity.ok(new DadosDetalhamentoTopico(detalhamento));
+  }
 }
