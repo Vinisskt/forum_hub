@@ -158,6 +158,5 @@ public class UsuarioControllerTest {
         .andReturn().getResponse();
 
     return response;
-
   }
 }
