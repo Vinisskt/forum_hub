@@ -151,7 +151,6 @@ public class UsuarioControllerTest {
     when(authenticationManager.authenticate(any())).thenReturn(auteticacaoFalsa);
     when(tokenAutentificacao.gerarToken(any())).thenReturn("fake-123");
 
-    System.out.println(login);
     var response = mockMvc.perform(post(rota)
         .contentType(MediaType.APPLICATION_JSON)
         .content(aJacksonTester.write(login).getJson()))
