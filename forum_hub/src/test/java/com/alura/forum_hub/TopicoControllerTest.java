@@ -29,6 +29,7 @@ import com.alura.forum_hub.infra.validacoes.ValidacoesTopicoCadastro;
 import com.alura.forum_hub.repository.TopicoRepository;
 import com.alura.forum_hub.repository.UsuarioRepository;
 import com.alura.forum_hub.topicos.DadosCadastroTopico;
+import com.alura.forum_hub.topicos.DadosDetalhamentoTopico;
 import com.alura.forum_hub.topicos.Topico;
 import com.alura.forum_hub.usuario.Usuario;
 
@@ -43,6 +44,8 @@ public class TopicoControllerTest {
   @Autowired
   private JacksonTester<DadosCadastroTopico> cJacksonTester;
 
+  @Autowired
+  private JacksonTester<DadosDetalhamentoTopico> dJacksonTester;
   @MockitoBean
   private TopicoRepository topicoRepository;
 
@@ -59,12 +62,36 @@ public class TopicoControllerTest {
   private SecurityFilter security;
 
   @Test
-  @DisplayName("validacao deve retornar status 201 quando todos os campos sao validos")
+  @DisplayName("validacao deve retornar status 201 quando todos os campos sao validos | valida a saida de DadosDetalhamentoTopico")
   @WithMockUser
   public void cadastrarCenario1() throws Exception {
     var response = testCadastro("erro com mockito", "erro com import static", Cursos.JAVA, "/topicos");
 
     assertThat(response.getStatus()).isEqualTo(HttpStatus.CREATED.value());
+  }
+
+  @Test
+  @DisplayName("validacao deve retornar status 400 quando o campo titulo esta vazio")
+  @WithMockUser
+  public void cadastrarCenario2() throws Exception {
+    var response = testCadastro("", "erro com import static", Cursos.JAVA, "/topicos");
+
+    assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+  }
+
+  @Test
+  @DisplayName("validacao deve retornar status 400 qunado o campo mensagem esta vazio")
+  @WithMockUser
+  public void cadastrarCenario3() throws Exception {
+    var response = testCadastro("erro com mockito", "", Cursos.JAVA, "/topicos");
+
+    assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
+  }
+
+  // criaçao do json de DadosDetalhamentoTopico
+  private String testCadastroSaidaDTO(Topico topico) throws Exception {
+    var dados = new DadosDetalhamentoTopico(topico);
+    return dJacksonTester.write(dados).getJson();
   }
 
   // corpo dos testes de cadastro
@@ -73,16 +100,21 @@ public class TopicoControllerTest {
 
     var cadastro = new DadosCadastroTopico(titulo, mensagem, cursos);
     var usuario = new Usuario(1L, "vinisskt", "12345678");
-    when(usuarioRepository.save(any())).thenReturn(usuario);
 
     var topicos = new Topico(1L, cadastro.titulo(), cadastro.curso(), usuario, cadastro.mensagem(), LocalDateTime.now(),
         "nao respondido");
+
+    var detalhemnto = testCadastroSaidaDTO(topicos);
     when(topicoRepository.save(any())).thenReturn(topicos);
 
     var response = mockMvc.perform(post(rota)
         .contentType(MediaType.APPLICATION_JSON)
         .content(cJacksonTester.write(cadastro).getJson()))
         .andReturn().getResponse();
+
+    if (response.getStatus() == HttpStatus.CREATED.value()) {
+      assertThat(response.getContentAsString()).isEqualTo(detalhemnto);
+    }
 
     return response;
   }
