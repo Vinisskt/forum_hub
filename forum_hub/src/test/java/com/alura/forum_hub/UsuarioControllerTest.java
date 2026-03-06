@@ -90,12 +90,13 @@ public class UsuarioControllerTest {
     assertThat(response.getStatus()).isEqualTo(HttpStatus.BAD_REQUEST.value());
   }
 
+  @Test
   @DisplayName("Deveria retornar status 200 quando informado entradas validas")
   @WithMockUser
   void cadastrar_cenario() throws Exception {
     var response = testCadastro("vinisskt", "12345678", "/usuario/cadastro");
 
-    assertThat(response.getStatus()).isEqualTo(HttpStatus.OK.value());
+    assertThat(response.getStatus()).isEqualTo(HttpStatus.CREATED.value());
   }
 
   // corpo do testcadastro
