@@ -52,7 +52,7 @@ public class TopicoController {
     validacoesTopicoCadastro.validar(dados);
     var topico = new Topico(dados, usuarioLogado);
     topico = repository.save(topico);
-    var uri = uriComponentsBuilder.path("topicos/{id}").buildAndExpand(topico.getId()).toUri();
+    var uri = uriComponentsBuilder.path("/topicos/{id}").buildAndExpand(topico.getId()).toUri();
     return ResponseEntity.created(uri).body(new DadosDetalhamentoTopico(topico));
   }
 
