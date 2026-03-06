@@ -12,10 +12,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import com.alura.forum_hub.infra.validacoes.ValidacaoIdExiste;
 import com.alura.forum_hub.repository.RespostaRepository;
 import com.alura.forum_hub.repository.TopicoRepository;
+import com.alura.forum_hub.repository.UsuarioRepository;
 import com.alura.forum_hub.respostas.DadosCadastroRespostas;
 import com.alura.forum_hub.respostas.DadosDetalhamentoResposta;
 import com.alura.forum_hub.respostas.Resposta;
@@ -29,6 +31,9 @@ import jakarta.validation.Valid;
 public class RespostasController {
 
   @Autowired
+  private UsuarioRepository usuarioRepository;
+
+  @Autowired
   private TopicoRepository topicoRepository;
 
   @Autowired
@@ -40,12 +45,14 @@ public class RespostasController {
   @PostMapping("/{id}/resposta")
   @Transactional
   public ResponseEntity cadastrarResposta(@RequestBody @Valid DadosCadastroRespostas dados,
-      @PathVariable Long id) {
-    var usuarioLogado = (Usuario) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+      @PathVariable Long id, UriComponentsBuilder uriComponentsBuilder) {
+    var usuarioLogado = SecurityContextHolder.getContext().getAuthentication().getName();
     var topico = topicoRepository.getReferenceById(id);
-    var resposta = new Resposta(topico, dados.resposta(), usuarioLogado);
+    var usuario = usuarioRepository.findUsuarioByLogin(usuarioLogado);
+    var resposta = new Resposta(topico, dados.resposta(), usuario);
     respostaRepository.save(resposta);
-    return ResponseEntity.ok(new DadosDetalhamentoResposta(resposta));
+    var uri = uriComponentsBuilder.path("/topicos/{id}/resposta").buildAndExpand(id).toUri();
+    return ResponseEntity.created(uri).body(new DadosDetalhamentoResposta(resposta));
   }
 
   @GetMapping("/{id}/resposta")
