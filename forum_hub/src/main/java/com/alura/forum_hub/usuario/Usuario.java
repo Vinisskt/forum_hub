@@ -25,35 +25,35 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(of = "id")
 public class Usuario implements UserDetails {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-	private String login;
-	private String senha;
+  private String login;
+  private String senha;
 
-	public Usuario(DadosCadastroUsuario dados, String senha) {
-		this.login = dados.login();
-		this.senha = senha;
-	}
+  public Usuario(DadosCadastroUsuario dados, String senha) {
+    this.login = dados.login();
+    this.senha = senha;
+  }
 
-	public void atualizar(String senha) {
-		this.senha = senha;
-	}
+  public void atualizar(String senha) {
+    this.senha = senha;
+  }
 
-	@Override
-	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return List.of(new SimpleGrantedAuthority("USER_ROLE"));
-	}
+  @Override
+  public Collection<? extends GrantedAuthority> getAuthorities() {
+    return List.of(new SimpleGrantedAuthority("USER_ROLE"));
+  }
 
-	@Override
-	public String getPassword() {
-		return senha;
-	}
+  @Override
+  public String getPassword() {
+    return senha;
+  }
 
-	@Override
-	public String getUsername() {
-		return login;
-	}
+  @Override
+  public String getUsername() {
+    return login;
+  }
 
 }
